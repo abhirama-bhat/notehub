@@ -1,0 +1,67 @@
+<script type="module">
+  import { initFirebase, db } from "./firebase.js";
+  import { uploadToCloudinary } from "./cloudinary.js";
+  import {
+    collection,
+    addDoc,
+    Timestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  /* --- FIREBASE CONFIG (already filled for you) --- */
+  initFirebase({
+    apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
+    authDomain: "studyhub-519c3.firebaseapp.com",
+    projectId: "studyhub-519c3",
+    storageBucket: "studyhub-519c3.firebasestorage.app",
+    messagingSenderId: "154821601505",
+    appId: "1:154821601505:web:84012068aba30ada806fa0",
+    measurementId: "G-YG6H2PEP1G"
+  });
+
+  const form = document.getElementById("uploadForm");
+  const status = document.getElementById("status");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById("title").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const type = document.getElementById("type").value;
+    const tags = document.getElementById("tags").value.trim();
+    const desc = document.getElementById("desc").value.trim();
+    const file = document.getElementById("file").files[0];
+
+    if (!file) {
+      status.innerText = "❌ Select a file!";
+      return;
+    }
+
+    status.innerText = "⏳ Uploading file to Cloudinary...";
+
+    try {
+      // 1) Upload PDF → Cloudinary
+      const pdfUrl = await uploadToCloudinary(file);
+
+      status.innerText = "⏳ Saving details to Firestore...";
+
+      // 2) Save metadata → Firestore
+      await addDoc(collection(db, "materials"), {
+        title,
+        subject,
+        type,
+        tags,
+        description: desc,
+        url: pdfUrl,        // Cloudinary URL
+        approved: false,    // goes to pending
+        createdAt: Timestamp.now()
+      });
+
+      status.innerText = "✅ Upload complete — pending admin approval.";
+      form.reset();
+
+    } catch (err) {
+      console.error(err);
+      status.innerText = "❌ Upload failed. Check console.";
+    }
+  });
+</script>

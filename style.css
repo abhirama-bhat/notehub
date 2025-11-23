@@ -1,0 +1,63 @@
+/* style.css - clean minimal layout */
+:root{
+  --bg:#0f1724;
+  --card:#0b1220;
+  --muted:#94a3b8;
+  --accent:#60a5fa;
+  --accent2:#8b5cf6;
+  --glass: rgba(255,255,255,0.03);
+  --maxWidth:1100px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  margin:0; background:linear-gradient(180deg,#071028,#071428);
+  color:#e6eef8; min-height:100vh;
+}
+.site-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px; backdrop-filter: blur(6px);
+  background: linear-gradient(90deg, rgba(10,16,30,0.55), rgba(8,12,20,0.35));
+  border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.logo{font-weight:700; color:var(--accent); font-size:1.25rem}
+.site-header nav a{color:#cfe7ff; text-decoration:none; margin-left:14px; font-size:0.95rem}
+.container{max-width:var(--maxWidth); margin:30px auto; padding:0 16px}
+.hero{padding:60px 0; text-align:left}
+.hero h1{font-size:2.4rem; margin:0 0 10px; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; color:transparent}
+.hero p{color:var(--muted); margin:0 0 16px}
+.hero-actions .btn{margin-right:10px}
+
+/* cards */
+.controls{display:flex; gap:12px; align-items:center; margin:12px 0 22px}
+.controls input, .controls select{padding:10px 12px; border-radius:8px; border:none; background:var(--glass); color:inherit}
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px}
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(2,6,23,0.6);
+}
+.card h3{margin:0 0 6px; color:var(--accent)}
+.card .meta{font-size:0.9rem; color:var(--muted); margin:0 0 8px}
+.card p{margin:6px 0 0; color:#dbeafe}
+
+/* header / form */
+.form{display:flex; flex-direction:column; gap:8px; max-width:640px}
+.form input, .form textarea, .form select{padding:10px; border-radius:8px; border:none; background:var(--glass); color:inherit}
+.form textarea{min-height:90px; resize:vertical}
+.muted{color:var(--muted)}
+
+/* buttons */
+.btn{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:white; border:none; padding:10px 14px; border-radius:8px; cursor:pointer}
+.btn.small{padding:6px 8px; font-size:0.9rem}
+.btn.ghost, .btn.small.ghost{background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--accent)}
+.card-actions{margin-top:12px; display:flex; gap:8px}
+
+/* footer */
+.footer{padding:20px; text-align:center; color:var(--muted); margin-top:30px}
+
+/* responsive */
+@media (max-width:600px){
+  .hero h1{font-size:1.6rem}
+  .controls{flex-direction:column; align-items:stretch}
+}

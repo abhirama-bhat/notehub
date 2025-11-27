@@ -27,11 +27,12 @@ VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 });
 
 <div class="page-hero">
   <h1>Upload Material</h1>
-  <p>Share your notes or PYQs with the community.</p>
+  <p>Share notes, PYQs or study files with students.</p>
 </div>
 
 <main class="container">
   <form id="uploadForm" class="card">
+
     <input id="title" class="input" placeholder="Title" required>
     <input id="subject" class="input" placeholder="Subject" required>
 
@@ -69,10 +70,9 @@ initFirebase({
 
 document.getElementById("uploadForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const status = document.getElementById("status");
-  status.textContent = "Uploading to Cloudinary...";
 
+  status.textContent = "Uploading to Cloudinary...";
   const file = document.getElementById("file").files[0];
   const url = await uploadToCloudinary(file);
 

@@ -27,7 +27,7 @@ VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 });
 
 <div class="page-hero">
   <h1>Browse Notes</h1>
-  <p>Find notes, PYQs, and uploaded materials instantly.</p>
+  <p>Find notes, PYQs, assignments and resources instantly.</p>
 </div>
 
 <main class="container">
@@ -38,6 +38,7 @@ VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 });
 <footer>© 2025 NoteHub</footer>
 
 <script type="module">
+/* Firebase Code unchanged */
 import { initFirebase, db } from "./firebase.js";
 import { collection, query, where, orderBy, getDocs }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -58,9 +59,9 @@ async function load() {
   cards.innerHTML = "<p class='muted'>Loading...</p>";
 
   const q = query(
-    collection(db, "materials"),
-    where("approved", "==", true),
-    orderBy("createdAt", "desc")
+    collection(db,"materials"),
+    where("approved","==",true),
+    orderBy("createdAt","desc")
   );
 
   const snap = await getDocs(q);
@@ -83,10 +84,10 @@ function render(list) {
     div.className = "card";
     div.innerHTML = `
       <h3>${it.title}</h3>
-      <p class="muted">${it.subject} • ${it.type}</p>
+      <p class='muted'>${it.subject} • ${it.type}</p>
       <p>${it.description}</p>
-      <div class="card-actions">
-        <a class="btn small" href="${it.url}" target="_blank">View PDF</a>
+      <div class='card-actions'>
+        <a class='btn small' href='${it.url}' target='_blank'>View PDF</a>
       </div>
     `;
     cards.appendChild(div);

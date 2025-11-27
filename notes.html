@@ -7,141 +7,118 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="logo">NoteHub</div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="notes.html">Notes</a>
-      <a href="upload.html">Upload</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-  </header>
 
-  <main class="container">
-    <h2>Find Notes</h2>
+<header class="site-header">
+  <div class="logo">NoteHub</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="notes.html">Notes</a>
+    <a href="upload.html">Upload</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+</header>
 
-    <div class="controls">
-      <input id="search" placeholder="Search by title, subject, tag..." />
-      <select id="typeFilter">
-        <option value="">All Types</option>
-        <option value="Note">Note</option>
-        <option value="PYQ">PYQ</option>
-      </select>
-    </div>
+<main class="container">
+  <h2>Find Notes</h2>
 
-    <div id="cards" class="cards">
-      <!-- cards will be inserted here -->
-    </div>
-  </main>
+  <div class="controls">
+    <input id="search" placeholder="Search by title, subject, tag...">
+    <select id="typeFilter">
+      <option value="">All Types</option>
+      <option value="Note">Note</option>
+      <option value="PYQ">PYQ</option>
+    </select>
+  </div>
 
-  <footer class="footer">© 2025 NoteHub</footer>
+  <div id="cards" class="cards"></div>
+</main>
 
-  <script type="module">
-    import { initFirebase } from './firebase.js';
-    // IMPORTANT: Replace this config with yours
-    const firebaseConfig = {
-      apiKey: "REPLACE_ME",
-      authDomain: "REPLACE_ME",
-      projectId: "REPLACE_ME",
-      storageBucket: "REPLACE_ME",
-      messagingSenderId: "REPLACE_ME",
-      appId: "REPLACE_ME"
-    };
-    initFirebase(firebaseConfig);
+<footer class="footer">© 2025 NoteHub</footer>
 
-    // small delay to allow firebase.js to load then import Firestore functions
-    setTimeout(() => {
-      (async () => {
-        const { getFirestore, collection, query, where, getDocs, orderBy } =
-          await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+<script type="module">
+  import { initFirebase, db } from "./firebase.js";
+  import { collection, query, where, getDocs, orderBy } from 
+    "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        const { getStorage, ref, getDownloadURL } =
-          await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js');
+  initFirebase({
+    apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
+    authDomain: "studyhub-519c3.firebaseapp.com",
+    projectId: "studyhub-519c3",
+    storageBucket: "studyhub-519c3.firebasestorage.app",
+    messagingSenderId: "154821601505",
+    appId: "1:154821601505:web:84012068aba30ada806fa0",
+    measurementId: "G-YG6H2PEP1G"
+  });
 
-        // access db from firebase.js (global in module scope)
-        const dbModule = await import('./firebase.js');
-        // dbModule.db will be undefined until firebase app is initialized, so wait
-        let waitForDb = 0;
-        while (!dbModule.db && waitForDb < 30) { await new Promise(r => setTimeout(r, 200)); waitForDb++; }
-        const db = dbModule.db;
-        const storage = dbModule.storage;
+  const cardsEl = document.getElementById("cards");
+  const searchEl = document.getElementById("search");
+  const typeFilter = document.getElementById("typeFilter");
 
-        const cardsEl = document.getElementById('cards');
-        const searchEl = document.getElementById('search');
-        const typeFilter = document.getElementById('typeFilter');
+  async function loadMaterials() {
+    cardsEl.innerHTML = "<p class='muted'>Loading...</p>";
 
-        async function loadMaterials() {
-          cardsEl.innerHTML = '<p class="muted">Loading...</p>';
-          const materialsRef = collection(db, 'materials');
-          // only show approved
-          const q = query(materialsRef, where('approved', '==', true), orderBy('createdAt', 'desc'));
-          const snap = await getDocs(q);
-          const items = [];
-          snap.forEach(doc => {
-            items.push({ id: doc.id, ...doc.data() });
-          });
-          renderList(items);
-        }
+    const q = query(
+      collection(db, "materials"),
+      where("approved", "==", true)
+    );
 
-        function renderList(items) {
-          const qText = (searchEl.value || '').toLowerCase();
-          const type = typeFilter.value;
-          let filtered = items.filter(it => {
-            if (type && it.type !== type) return false;
-            if (!qText) return true;
-            return (it.title || '').toLowerCase().includes(qText)
-              || (it.subject || '').toLowerCase().includes(qText)
-              || (it.tags || '').toLowerCase().includes(qText);
-          });
-          if (!filtered.length) {
-            cardsEl.innerHTML = '<p class="muted">No notes found.</p>';
-            return;
-          }
-          cardsEl.innerHTML = '';
-          filtered.forEach(async it => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            const title = document.createElement('h3');
-            title.innerText = it.title || 'Untitled';
-            const meta = document.createElement('p');
-            meta.className = 'meta';
-            meta.innerText = `${it.subject || '—'} • ${it.type || '—'}`;
-            const actions = document.createElement('div');
-            actions.className = 'card-actions';
-            // get file URL
-            try {
-              const url = await getDownloadURL(ref(storage, it.storagePath));
-              const a = document.createElement('a');
-              a.href = url;
-              a.target = '_blank';
-              a.rel = 'noopener';
-              a.innerText = 'Preview / Download';
-              a.className = 'btn small';
-              actions.appendChild(a);
-            } catch (e) {
-              const span = document.createElement('span');
-              span.className = 'muted';
-              span.innerText = 'File not available';
-              actions.appendChild(span);
-            }
-            card.appendChild(title);
-            card.appendChild(meta);
-            if (it.description) {
-              const p = document.createElement('p');
-              p.innerText = it.description;
-              card.appendChild(p);
-            }
-            card.appendChild(actions);
-            cardsEl.appendChild(card);
-          });
-        }
+    const snap = await getDocs(q);
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        searchEl.addEventListener('input', () => loadMaterials());
-        typeFilter.addEventListener('change', () => loadMaterials());
+    render(items);
+  }
 
-        loadMaterials();
-      })();
-    }, 300);
-  </script>
+  function render(items) {
+    const search = searchEl.value.toLowerCase();
+    const type = typeFilter.value;
+
+    const filtered = items.filter(item => {
+      if (type && item.type !== type) return false;
+      return (
+        item.title.toLowerCase().includes(search) ||
+        item.subject.toLowerCase().includes(search) ||
+        (item.tags || "").toLowerCase().includes(search)
+      );
+    });
+
+    cardsEl.innerHTML = "";
+
+    filtered.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <h3>${item.title}</h3>
+        <p class="meta">${item.subject} • ${item.type}</p>
+      `;
+
+      if (item.description) {
+        const desc = document.createElement("p");
+        desc.innerText = item.description;
+        card.appendChild(desc);
+      }
+
+      // CLOUDINARY URL (not Firebase storage)
+      const btn = document.createElement("a");
+      btn.href = item.url;
+      btn.target = "_blank";
+      btn.className = "btn small";
+      btn.innerText = "Preview / Download";
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+      actions.appendChild(btn);
+
+      card.appendChild(actions);
+      cardsEl.appendChild(card);
+    });
+  }
+
+  searchEl.addEventListener("input", loadMaterials);
+  typeFilter.addEventListener("change", loadMaterials);
+
+  loadMaterials();
+</script>
+
 </body>
 </html>

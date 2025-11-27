@@ -7,136 +7,115 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="logo">NoteHub</div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="notes.html">Notes</a>
-      <a href="upload.html">Upload</a>
-      <a href="admin.html">Admin</a>
-    </nav>
-  </header>
 
-  <main class="container">
-    <h2>Admin — Pending Uploads</h2>
+<header class="site-header">
+  <div class="logo">NoteHub</div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="notes.html">Notes</a>
+    <a href="upload.html">Upload</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+</header>
 
-    <p class="muted">Basic password required to view admin controls.</p>
-    <div>
-      <input id="adminPass" placeholder="Admin password" type="password" />
-      <button id="unlock" class="btn">Unlock</button>
-    </div>
+<main class="container">
+  <h2>Admin — Pending Uploads</h2>
 
-    <div id="pending" class="cards"></div>
-  </main>
+  <p class="muted">Enter admin password:</p>
+  <input id="adminPass" type="password" placeholder="Password">
+  <button id="unlock" class="btn">Unlock</button>
 
-  <footer class="footer">© 2025 NoteHub</footer>
+  <div id="pending" class="cards"></div>
+</main>
 
-  <script type="module">
-    import { initFirebase } from './firebase.js';
-    // same firebaseConfig — replace with yours
-    const firebaseConfig = {
-      apiKey: "REPLACE_ME",
-      authDomain: "REPLACE_ME",
-      projectId: "REPLACE_ME",
-      storageBucket: "REPLACE_ME",
-      messagingSenderId: "REPLACE_ME",
-      appId: "REPLACE_ME"
-    };
-    initFirebase(firebaseConfig);
+<footer class="footer">© 2025 NoteHub</footer>
 
-    // CHANGE THIS password to something secure before you use in production
-    const ADMIN_PASSWORD = 'notehub-admin-2025';
+<script type="module">
+  import { initFirebase, db } from './firebase.js';
+  import {
+    collection, query, where, getDocs, doc, updateDoc, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    setTimeout(() => {
-      (async () => {
-        const { getFirestore, collection, query, where, getDocs, doc, updateDoc, deleteDoc } =
-          await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
-        const { ref, deleteObject } =
-          await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js');
+  // FIXED FIREBASE CONFIG
+  initFirebase({
+    apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
+    authDomain: "studyhub-519c3.firebaseapp.com",
+    projectId: "studyhub-519c3",
+    storageBucket: "studyhub-519c3.firebasestorage.app",
+    messagingSenderId: "154821601505",
+    appId: "1:154821601505:web:84012068aba30ada806fa0",
+    measurementId: "G-YG6H2PEP1G"
+  });
 
-        const firebaseModule = await import('./firebase.js');
-        while (!firebaseModule.db) { await new Promise(r => setTimeout(r, 200)); }
-        const db = firebaseModule.db;
-        const storage = firebaseModule.storage;
+  const ADMIN_PASSWORD = "notehub-admin-2025";
+  let unlocked = false;
 
-        const unlockBtn = document.getElementById('unlock');
-        const passEl = document.getElementById('adminPass');
-        const pendingEl = document.getElementById('pending');
+  const unlockBtn = document.getElementById("unlock");
+  const pendingEl = document.getElementById("pending");
 
-        let unlocked = false;
+  unlockBtn.addEventListener("click", () => {
+    const pass = document.getElementById("adminPass").value;
+    if (pass === ADMIN_PASSWORD) {
+      unlocked = true;
+      loadPending();
+      alert("Admin unlocked.");
+    } else {
+      alert("Wrong password!");
+    }
+  });
 
-        unlockBtn.addEventListener('click', () => {
-          if (passEl.value === ADMIN_PASSWORD) {
-            unlocked = true;
-            passEl.value = '';
-            loadPending();
-            alert('Admin unlocked — you can approve or delete items.');
-          } else {
-            alert('Wrong password.');
-          }
-        });
+  async function loadPending() {
+    pendingEl.innerHTML = "<p class='muted'>Loading...</p>";
 
-        async function loadPending() {
-          pendingEl.innerHTML = '<p class="muted">Loading pending uploads...</p>';
-          const materialsRef = collection(db, 'materials');
-          const q = query(materialsRef, where('approved', '==', false));
-          const snap = await getDocs(q);
-          const items = [];
-          snap.forEach(d => items.push({ id: d.id, ...d.data() }));
-          render(items);
-        }
+    const q = query(collection(db, "materials"), where("approved", "==", false));
+    const snap = await getDocs(q);
 
-        function render(items) {
-          if (!items.length) {
-            pendingEl.innerHTML = '<p class="muted">No pending uploads.</p>';
-            return;
-          }
-          pendingEl.innerHTML = '';
-          items.forEach(it => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            const h = document.createElement('h3'); h.innerText = it.title || 'Untitled';
-            const meta = document.createElement('p'); meta.className = 'meta';
-            meta.innerText = `${it.subject || '—'} • ${it.type || ''}`;
-            const desc = document.createElement('p'); desc.innerText = it.description || '';
-            const actions = document.createElement('div'); actions.className = 'card-actions';
-            const approveBtn = document.createElement('button'); approveBtn.className = 'btn small';
-            approveBtn.innerText = 'Approve';
-            const delBtn = document.createElement('button'); delBtn.className = 'btn small ghost';
-            delBtn.innerText = 'Delete';
-            actions.appendChild(approveBtn);
-            actions.appendChild(delBtn);
-            card.appendChild(h);
-            card.appendChild(meta);
-            card.appendChild(desc);
-            card.appendChild(actions);
-            pendingEl.appendChild(card);
+    pendingEl.innerHTML = "";
 
-            approveBtn.addEventListener('click', async () => {
-              if (!unlocked) return alert('Unlock admin first');
-              await updateDoc(doc(db, 'materials', it.id), { approved: true });
-              card.remove();
-            });
+    snap.forEach(d => {
+      const data = d.data();
 
-            delBtn.addEventListener('click', async () => {
-              if (!unlocked) return alert('Unlock admin first');
-              if (!confirm('Delete this upload permanently?')) return;
-              // delete storage file
-              try {
-                const storageRef = ref(storage, it.storagePath);
-                await deleteObject(storageRef);
-              } catch (e) {
-                console.warn('Could not delete storage file (may not exist)', e);
-              }
-              // delete firestore doc
-              await deleteDoc(doc(db, 'materials', it.id));
-              card.remove();
-            });
-          });
-        }
+      const card = document.createElement("div");
+      card.className = "card";
 
-      })();
-    }, 300);
-  </script>
+      card.innerHTML = `
+        <h3>${data.title}</h3>
+        <p class="meta">${data.subject} • ${data.type}</p>
+        <p>${data.description || ""}</p>
+      `;
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+
+      const approveBtn = document.createElement("button");
+      approveBtn.className = "btn small";
+      approveBtn.innerText = "Approve";
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn small ghost";
+      delBtn.innerText = "Delete";
+
+      actions.appendChild(approveBtn);
+      actions.appendChild(delBtn);
+
+      card.appendChild(actions);
+      pendingEl.appendChild(card);
+
+      approveBtn.addEventListener("click", async () => {
+        if (!unlocked) return alert("Unlock admin first.");
+        await updateDoc(doc(db, "materials", d.id), { approved: true });
+        card.remove();
+      });
+
+      delBtn.addEventListener("click", async () => {
+        if (!unlocked) return alert("Unlock admin first.");
+        await deleteDoc(doc(db, "materials", d.id));
+        card.remove();
+      });
+
+    });
+  }
+</script>
+
 </body>
 </html>

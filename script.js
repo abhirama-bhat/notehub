@@ -1,3 +1,2 @@
-// script.js
-// placeholder for shared helpers if needed later
-export function noop(){ return null; }
+// No shared JS required now
+export function noop() { return null; }

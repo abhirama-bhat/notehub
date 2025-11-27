@@ -1,14 +1,14 @@
-export default async function uploadToCloudinary(file) {
+export async function uploadToCloudinary(file) {
   const cloudName = "duluosq5w";
-  const uploadPreset = "notehub_preset";
+  const preset = "notehub_preset";
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", uploadPreset);
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", preset);
 
   const res = await fetch(
     `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
-    { method: "POST", body: formData }
+    { method: "POST", body: fd }
   );
 
   const data = await res.json();

@@ -1,51 +1,15 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NoteHub — Admin</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<header class="site-header">
-  <div class="logo">NoteHub</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="notes.html">Notes</a>
-    <a href="upload.html">Upload</a>
-    <a href="admin.html">Admin</a>
-  </nav>
-</header>
-
-<main class="container">
-  <h2>Admin — Pending Uploads</h2>
-
-  <p class="muted">Enter admin password:</p>
-  <input id="adminPass" type="password" placeholder="Password">
-  <button id="unlock" class="btn">Unlock</button>
-
-  <div id="pending" class="cards"></div>
-</main>
-
-<footer class="footer">© 2025 NoteHub</footer>
-
 <script type="module">
-  import { initFirebase, db } from './firebase.js';
-  import {
-    collection, query, where, getDocs, doc, updateDoc, deleteDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { db } from "./firebase.js";
 
-  // FIXED FIREBASE CONFIG
-  initFirebase({
-    apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
-    authDomain: "studyhub-519c3.firebaseapp.com",
-    projectId: "studyhub-519c3",
-    storageBucket: "studyhub-519c3.firebasestorage.app",
-    messagingSenderId: "154821601505",
-    appId: "1:154821601505:web:84012068aba30ada806fa0",
-    measurementId: "G-YG6H2PEP1G"
-  });
+  import {
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    updateDoc,
+    deleteDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const ADMIN_PASSWORD = "notehub-admin-2025";
   let unlocked = false;
@@ -97,7 +61,6 @@
 
       actions.appendChild(approveBtn);
       actions.appendChild(delBtn);
-
       card.appendChild(actions);
       pendingEl.appendChild(card);
 
@@ -109,13 +72,10 @@
 
       delBtn.addEventListener("click", async () => {
         if (!unlocked) return alert("Unlock admin first.");
+        if (!confirm("Delete this upload?")) return;
         await deleteDoc(doc(db, "materials", d.id));
         card.remove();
       });
-
     });
   }
 </script>
-
-</body>
-</html>

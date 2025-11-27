@@ -1,22 +1,12 @@
 <script type="module">
-  import { initFirebase, db } from "./firebase.js";
-  import { uploadToCloudinary } from "./cloudinary.js";
+  import { db } from "./firebase.js";
+  import uploadToCloudinary from "./cloudinary.js";
+
   import {
     collection,
     addDoc,
     Timestamp
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  /* --- FIREBASE CONFIG (already filled for you) --- */
-  initFirebase({
-    apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
-    authDomain: "studyhub-519c3.firebaseapp.com",
-    projectId: "studyhub-519c3",
-    storageBucket: "studyhub-519c3.firebasestorage.app",
-    messagingSenderId: "154821601505",
-    appId: "1:154821601505:web:84012068aba30ada806fa0",
-    measurementId: "G-YG6H2PEP1G"
-  });
 
   const form = document.getElementById("uploadForm");
   const status = document.getElementById("status");
@@ -32,36 +22,36 @@
     const file = document.getElementById("file").files[0];
 
     if (!file) {
-      status.innerText = "❌ Select a file!";
+      status.innerText = "❌ Select a PDF file!";
       return;
     }
 
-    status.innerText = "⏳ Uploading file to Cloudinary...";
+    status.innerText = "⏳ Uploading PDF to Cloudinary...";
 
     try {
-      // 1) Upload PDF → Cloudinary
+      // 1) Upload file → Cloudinary
       const pdfUrl = await uploadToCloudinary(file);
 
-      status.innerText = "⏳ Saving details to Firestore...";
+      status.innerText = "⏳ Saving details in Firestore...";
 
-      // 2) Save metadata → Firestore
+      // 2) Save metadata in Firestore
       await addDoc(collection(db, "materials"), {
         title,
         subject,
         type,
         tags,
         description: desc,
-        url: pdfUrl,        // Cloudinary URL
-        approved: false,    // goes to pending
+        url: pdfUrl,          // Final Cloudinary link
+        approved: false,      // Pending approval
         createdAt: Timestamp.now()
       });
 
-      status.innerText = "✅ Upload complete — pending admin approval.";
+      status.innerText = "✅ Upload successful — pending admin approval!";
       form.reset();
 
     } catch (err) {
       console.error(err);
-      status.innerText = "❌ Upload failed. Check console.";
+      status.innerText = "❌ Upload failed.";
     }
   });
 </script>

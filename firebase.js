@@ -1,4 +1,3 @@
-// ---------------- Firebase Config ----------------
 const firebaseConfig = {
   apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
   authDomain: "studyhub-519c3.firebaseapp.com",
@@ -9,20 +8,10 @@ const firebaseConfig = {
   measurementId: "G-YG6H2PEP1G"
 };
 
-// ---------------- Initialize Firebase ----------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let app = null;
-let db = null;
-
-export function initFirebase() {
-  if (!app) {
-    app = initializeApp(firebaseConfig);
-    db  = getFirestore(app);
-    console.log("🔥 Firebase initialized");
-  }
-}
-
-// Export db for other pages
-export { db };
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);

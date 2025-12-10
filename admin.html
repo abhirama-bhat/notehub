@@ -1,136 +1,55 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin — NoteHub</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div id="bg-animation"></div>
 
-  <header>
-    <div class="logo">NoteHub</div>
-    <nav><a href="index.html">Home</a><a href="notes.html">Notes</a></nav>
-  </header>
+<div id="bg-animation"></div>
 
-  <main class="container page-hero">
-    <h1>Admin Panel</h1>
-    <p class="muted">Approve uploads and handle issue reports.</p>
+<header>
+  <div class="logo">NoteHub</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/notes">Notes</a>
+  </nav>
+</header>
 
-    <div class="admin-unlock-card card">
-      <input id="pass" class="input" placeholder="Enter admin password">
-      <button id="unlock" class="btn" style="width:100%">Unlock</button>
+<main class="container page-hero">
+  <h1>Admin Panel</h1>
+  <p class="muted">Approve uploads and resolve issues.</p>
+
+  <div class="admin-unlock-card card">
+    <input id="pass" class="input" placeholder="Enter admin password">
+    <button id="unlock" class="btn" style="width:100%">Unlock</button>
+  </div>
+
+  <div id="adminArea" style="display:none">
+    <div style="display:flex; gap:10px;">
+      <button id="tabUploads" class="btn small">Pending Uploads</button>
+      <button id="tabIssues" class="btn small ghost">Issue Reports</button>
     </div>
 
-    <div id="adminArea" style="display:none;margin-top:18px">
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <button id="tabUploads" class="btn small">Pending Uploads</button>
-        <button id="tabIssues" class="btn small ghost">Issue Reports</button>
-      </div>
+    <div id="pendingUploads"></div>
+    <div id="issueReports" style="display:none"></div>
+  </div>
+</main>
 
-      <div id="pendingUploads"></div>
-      <div id="issueReports" style="display:none"></div>
-    </div>
-  </main>
+<footer>© 2025 NoteHub</footer>
 
-  <footer>© 2025 NoteHub</footer>
+<script type="module" src="/script.js"></script>
 
-  <script type="module">
-    import { initFirebase, db } from "./firebase.js";
-    import { collection, query, where, orderBy, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
 
-    initFirebase({
-      apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
-      authDomain: "studyhub-519c3.firebaseapp.com",
-      projectId: "studyhub-519c3",
-      storageBucket: "studyhub-519c3.firebasestorage.app",
-      messagingSenderId: "154821601505",
-      appId: "1:154821601505:web:84012068aba30ada806fa0"
-    });
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 });
+});
+</script>
 
-    const ADMIN_PASS = "notehub-admin-2025";
-    const unlock = document.getElementById('unlock');
-    const pass = document.getElementById('pass');
-    const adminArea = document.getElementById('adminArea');
-
-    const pendingUploads = document.getElementById('pendingUploads');
-    const issueReports = document.getElementById('issueReports');
-    const tabUploads = document.getElementById('tabUploads');
-    const tabIssues = document.getElementById('tabIssues');
-
-    unlock.onclick = () => {
-      if (pass.value !== ADMIN_PASS) return alert('Wrong password');
-      adminArea.style.display = 'block';
-      loadPending();
-      loadIssues();
-    };
-
-    tabUploads.onclick = () => { pendingUploads.style.display='block'; issueReports.style.display='none'; tabUploads.classList.remove('ghost'); tabIssues.classList.add('ghost'); };
-    tabIssues.onclick = () => { pendingUploads.style.display='none'; issueReports.style.display='block'; tabIssues.classList.remove('ghost'); tabUploads.classList.add('ghost'); };
-
-    async function loadPending() {
-      pendingUploads.innerHTML = "<p class='muted'>Loading...</p>";
-      const q = query(collection(db,'materials'), where('approved','==',false), orderBy('createdAt','desc'));
-      const snap = await getDocs(q);
-      pendingUploads.innerHTML = '';
-      snap.forEach(d=> {
-        const it = d.data(); it.id = d.id;
-        const div = document.createElement('div'); div.className='card';
-        div.innerHTML = `
-          <h3>${it.title}</h3>
-          <div class="muted">${it.subject} • Module ${it.module} • ${it.type}</div>
-          <p class="muted">${it.description || ''}</p>
-          <div class="card-actions">
-            <a class="btn small" target="_blank" href="${it.urlView || it.urlRaw || it.url}">Open</a>
-            <button class="btn small">Approve</button>
-            <button class="btn small ghost">Delete</button>
-          </div>
-        `;
-        div.querySelector('.btn.small:nth-of-type(2)').onclick = async () => {
-          await updateDoc(doc(db,'materials',it.id), { approved:true });
-          div.remove();
-        };
-        div.querySelector('.btn.small:nth-of-type(3)').onclick = async () => {
-          await deleteDoc(doc(db,'materials',it.id));
-          div.remove();
-        };
-        pendingUploads.appendChild(div);
-      });
-    }
-
-    async function loadIssues() {
-      issueReports.innerHTML = "<p class='muted'>Loading issues...</p>";
-      const q = query(collection(db,'issues'), orderBy('createdAt','desc'));
-      const snap = await getDocs(q);
-      issueReports.innerHTML = '';
-      snap.forEach(d => {
-        const it = d.data(); it.id = d.id;
-        const div = document.createElement('div'); div.className='card';
-        div.innerHTML = `
-          <h3>${it.issueType}</h3>
-          <div class="muted">Note: ${it.noteId || '—'}</div>
-          <p class="muted">${it.description || ''}</p>
-          ${it.screenshotUrl ? `<div style="margin-top:8px"><img src="${it.screenshotUrl}" style="max-width:250px;border-radius:8px"></div>` : ''}
-          <div class="card-actions">
-            <button class="btn small">Mark Resolved</button>
-            <button class="btn small ghost">Delete Report</button>
-          </div>
-        `;
-        div.querySelector('.btn.small:nth-of-type(1)').onclick = async () => {
-          await updateDoc(doc(db,'issues',it.id), { status:'resolved' });
-          div.remove();
-        };
-        div.querySelector('.btn.small:nth-of-type(2)').onclick = async () => {
-          await deleteDoc(doc(db,'issues',it.id));
-          div.remove();
-        };
-        issueReports.appendChild(div);
-      });
-    }
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", ()=>{ if(window.vantaEffect) window.vantaEffect.destroy(); window.vantaEffect = VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617}); });</script>
 </body>
 </html>

@@ -1,101 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Upload Material — NoteHub</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div id="bg-animation"></div>
 
-  <header>
-    <div class="logo">NoteHub</div>
-    <nav><a href="index.html">Home</a><a href="notes.html">Notes</a></nav>
-  </header>
+<div id="bg-animation"></div>
 
-  <main class="container">
-    <h1>Upload Material</h1>
-    <p class="muted">Share notes or PYQs — admin will review before they appear.</p>
+<header>
+  <div class="logo">NoteHub</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/notes">Notes</a>
+    <a href="/issues">Report Issue</a>
+    <a href="/admin">Admin</a>
+  </nav>
+</header>
 
-    <form id="uploadForm" class="card">
-      <input id="title" class="input" placeholder="Title" required>
-      <select id="subject" class="input">
-        <option value="">Subject (A–E)</option>
-        <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-      </select>
+<main class="container page-hero">
+  <h1>Upload Material</h1>
+  <p class="muted">Share notes or PYQs — admin will review.</p>
 
-      <select id="module" class="input">
-        <option value="">Module</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-      </select>
+  <form id="uploadForm" class="card">
+    <input id="title" class="input" placeholder="Title" required>
+    <select id="subject" class="input">
+      <option value="">Subject (A–E)</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+    </select>
+    <select id="module" class="input"><option value="">Module</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+    <select id="type" class="input"><option>Note</option><option>PYQ</option></select>
+    <input id="tags" class="input" placeholder="Tags">
+    <textarea id="desc" class="input" placeholder="Short description"></textarea>
+    <input id="file" type="file" accept="application/pdf" class="input" required>
+    <button class="btn" type="submit">Upload</button>
+    <p id="status" class="muted"></p>
+  </form>
+</main>
 
-      <select id="type" class="input">
-        <option>Note</option><option>PYQ</option>
-      </select>
+<footer>© 2025 NoteHub</footer>
 
-      <input id="tags" class="input" placeholder="Tags (comma separated)">
-      <textarea id="desc" class="input" placeholder="Short description"></textarea>
+<script type="module" src="/script.js"></script>
 
-      <input id="file" type="file" accept="application/pdf" class="input" required>
-      <button class="btn" type="submit">Upload</button>
-      <p id="status" class="muted"></p>
-    </form>
-  </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
 
-  <footer>© 2025 NoteHub</footer>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+  VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 });
+});
+</script>
 
-  <script type="module">
-    import { initFirebase, db } from "./firebase.js";
-    import { uploadPdfToCloudinary } from "./cloudinary.js";
-    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    initFirebase({
-      apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
-      authDomain: "studyhub-519c3.firebaseapp.com",
-      projectId: "studyhub-519c3",
-      storageBucket: "studyhub-519c3.firebasestorage.app",
-      messagingSenderId: "154821601505",
-      appId: "1:154821601505:web:84012068aba30ada806fa0"
-    });
-
-    const form = document.getElementById('uploadForm');
-    const status = document.getElementById('status');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      status.textContent = "Uploading to Cloudinary...";
-
-      const file = document.getElementById('file').files[0];
-      if (!file) { status.textContent = "Choose a file."; return; }
-
-      try {
-        const pdf = await uploadPdfToCloudinary(file);
-        status.textContent = "Saving metadata...";
-
-        await addDoc(collection(db, "materials"), {
-          title: title.value,
-          subject: subject.value || "",
-          module: module.value || "",
-          type: type.value,
-          tags: tags.value || "",
-          description: desc.value || "",
-          urlRaw: pdf.raw,
-          urlView: pdf.viewable,
-          approved: false,
-          createdAt: serverTimestamp(),
-          views: 0
-        });
-
-        status.textContent = "Upload submitted — pending admin approval.";
-        form.reset();
-      } catch (err) {
-        console.error(err);
-        status.textContent = "Upload failed: " + (err.message || "");
-      }
-    });
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", ()=>{ if (window.vantaEffect) window.vantaEffect.destroy(); window.vantaEffect = VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 }); });</script>
 </body>
 </html>

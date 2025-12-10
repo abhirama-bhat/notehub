@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Report Issue — NoteHub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="bg-animation"></div>
+
+  <header>
+    <div class="logo">NoteHub</div>
+    <nav><a href="notes.html">Back</a></nav>
+  </header>
+
+  <main class="container">
+    <h1>Report an Issue</h1>
+    <p class="muted">Tell us what's wrong with a note and admin will review it.</p>
+
+    <form id="issueForm" class="card">
+      <input id="noteId" class="input" readonly placeholder="Note ID (auto-filled)">
+      <select id="issueType" class="input">
+        <option>Wrong file</option>
+        <option>Wrong subject/module</option>
+        <option>PDF corrupted</option>
+        <option>Pages missing</option>
+        <option>Duplicate</option>
+        <option>Offensive/Irrelevant</option>
+        <option>Other</option>
+      </select>
+
+      <textarea id="desc" class="input" placeholder="Describe the issue..."></textarea>
+      <input id="screenshot" type="file" accept="image/*" class="input">
+      <button class="btn" type="submit">Submit Issue</button>
+      <p id="status" class="muted"></p>
+    </form>
+  </main>
+
+  <footer>© 2025 NoteHub</footer>
+
+  <script type="module">
+    import { initFirebase, db } from "./firebase.js";
+    import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { uploadImageToCloudinary } from "./cloudinary.js";
+
+    initFirebase({
+      apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
+      authDomain: "studyhub-519c3.firebaseapp.com",
+      projectId: "studyhub-519c3",
+      storageBucket: "studyhub-519c3.firebasestorage.app",
+      messagingSenderId: "154821601505",
+      appId: "1:154821601505:web:84012068aba30ada806fa0"
+    });
+
+    // autofill noteId from URL
+    const params = new URLSearchParams(location.search);
+    document.getElementById('noteId').value = params.get('noteId') || '';
+
+    const form = document.getElementById('issueForm');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = "Submitting...";
+
+      try {
+        let screenshotUrl = "";
+        const file = document.getElementById('screenshot').files[0];
+        if (file) screenshotUrl = await uploadImageToCloudinary(file);
+
+        await addDoc(collection(db, "issues"), {
+          noteId: noteId.value || null,
+          issueType: issueType.value,
+          description: desc.value || "",
+          screenshotUrl,
+          createdAt: serverTimestamp(),
+          status: "pending"
+        });
+
+        status.textContent = "Issue submitted — admin will review it.";
+        form.reset();
+        document.getElementById('noteId').value = params.get('noteId') || '';
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Submission failed: " + (err.message || "");
+      }
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", ()=>{ if(window.vantaEffect) window.vantaEffect.destroy(); window.vantaEffect = VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617}); });</script>
+</body>
+</html>

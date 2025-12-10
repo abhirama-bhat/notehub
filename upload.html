@@ -1,120 +1,101 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Upload Material — NoteHub</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<div id="bg-animation"></div>
+  <div id="bg-animation"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <header>
+    <div class="logo">NoteHub</div>
+    <nav><a href="index.html">Home</a><a href="notes.html">Notes</a></nav>
+  </header>
 
-<script>
-let vantaEffect;
+  <main class="container">
+    <h1>Upload Material</h1>
+    <p class="muted">Share notes or PYQs — admin will review before they appear.</p>
 
-function initVanta() {
-  if (vantaEffect) vantaEffect.destroy();
+    <form id="uploadForm" class="card">
+      <input id="title" class="input" placeholder="Title" required>
+      <select id="subject" class="input">
+        <option value="">Subject (A–E)</option>
+        <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+      </select>
 
-  const isMobile = window.innerWidth < 768;
+      <select id="module" class="input">
+        <option value="">Module</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+      </select>
 
-  vantaEffect = VANTA.NET({
-    el: "#bg-animation",
-    color: 0x5cf0ff,
-    backgroundColor: 0x020617,
-    scale: 1.0,
-    scaleMobile: 1.0,
-    points: isMobile ? 3 : 10,
-    maxDistance: isMobile ? 10 : 22,
-    spacing: isMobile ? 14 : 18
-  });
-}
+      <select id="type" class="input">
+        <option>Note</option><option>PYQ</option>
+      </select>
 
-document.addEventListener("DOMContentLoaded", initVanta);
-window.addEventListener("resize", () => {
-  clearTimeout(window.vantaTimeout);
-  window.vantaTimeout = setTimeout(initVanta, 250);
-});
-</script>
+      <input id="tags" class="input" placeholder="Tags (comma separated)">
+      <textarea id="desc" class="input" placeholder="Short description"></textarea>
 
-<header>
-  <div class="logo">NoteHub</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="notes.html">Notes</a>
-    <a href="upload.html">Upload</a>
-    <a href="admin.html">Admin</a>
-  </nav>
-</header>
+      <input id="file" type="file" accept="application/pdf" class="input" required>
+      <button class="btn" type="submit">Upload</button>
+      <p id="status" class="muted"></p>
+    </form>
+  </main>
 
-<main class="container page-hero">
-  <h1>Upload Material</h1>
-  <p>Share notes or PYQs to help others learn.</p>
+  <footer>© 2025 NoteHub</footer>
 
-  <form id="uploadForm" class="card">
-    <input id="title" class="input" placeholder="Title" required>
-    <input id="subject" class="input" placeholder="Subject" required>
+  <script type="module">
+    import { initFirebase, db } from "./firebase.js";
+    import { uploadPdfToCloudinary } from "./cloudinary.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    <select id="type" class="input">
-      <option>Note</option>
-      <option>PYQ</option>
-    </select>
+    initFirebase({
+      apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
+      authDomain: "studyhub-519c3.firebaseapp.com",
+      projectId: "studyhub-519c3",
+      storageBucket: "studyhub-519c3.firebasestorage.app",
+      messagingSenderId: "154821601505",
+      appId: "1:154821601505:web:84012068aba30ada806fa0"
+    });
 
-    <input id="tags" class="input" placeholder="Tags (comma separated)">
-    <textarea id="desc" class="input" placeholder="Description"></textarea>
+    const form = document.getElementById('uploadForm');
+    const status = document.getElementById('status');
 
-    <input id="file" type="file" class="input" accept="application/pdf" required>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = "Uploading to Cloudinary...";
 
-    <button class="btn" type="submit">Upload</button>
-    <p id="status" class="muted"></p>
-  </form>
-</main>
+      const file = document.getElementById('file').files[0];
+      if (!file) { status.textContent = "Choose a file."; return; }
 
-<footer>© 2025 NoteHub</footer>
+      try {
+        const pdf = await uploadPdfToCloudinary(file);
+        status.textContent = "Saving metadata...";
 
-<script type="module">
-import { initFirebase, db } from "./firebase.js";
-import { uploadToCloudinary } from "./cloudinary.js";
-import { collection, addDoc, serverTimestamp }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        await addDoc(collection(db, "materials"), {
+          title: title.value,
+          subject: subject.value || "",
+          module: module.value || "",
+          type: type.value,
+          tags: tags.value || "",
+          description: desc.value || "",
+          urlRaw: pdf.raw,
+          urlView: pdf.viewable,
+          approved: false,
+          createdAt: serverTimestamp(),
+          views: 0
+        });
 
-initFirebase({
-  apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
-  authDomain: "studyhub-519c3.firebaseapp.com",
-  projectId: "studyhub-519c3",
-  storageBucket: "studyhub-519c3.firebasestorage.app",
-  messagingSenderId: "154821601505",
-  appId: "1:154821601505:web:84012068aba30ada806fa0"
-});
+        status.textContent = "Upload submitted — pending admin approval.";
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Upload failed: " + (err.message || "");
+      }
+    });
+  </script>
 
-document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const status = document.getElementById("status");
-
-  status.textContent = "Uploading to Cloudinary...";
-  const file = document.getElementById("file").files[0];
-  const url = await uploadToCloudinary(file);
-
-  status.textContent = "Saving to Firestore...";
-
-  await addDoc(collection(db, "materials"), {
-    title: title.value,
-    subject: subject.value,
-    type: type.value,
-    tags: tags.value,
-    description: desc.value,
-    url: url,
-    approved: false,
-    createdAt: serverTimestamp()
-  });
-
-  status.textContent = "Upload complete — pending admin approval.";
-  e.target.reset();
-});
-</script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", ()=>{ if (window.vantaEffect) window.vantaEffect.destroy(); window.vantaEffect = VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 }); });</script>
 </body>
 </html>

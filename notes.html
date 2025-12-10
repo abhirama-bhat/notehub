@@ -1,127 +1,208 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Browse Notes — NoteHub</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<div id="bg-animation"></div>
+  <div id="bg-animation"></div>
 
-<!-- Vanta BG Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <header>
+    <div class="logo">NoteHub</div>
+    <nav><a href="index.html">Home</a><a href="upload.html">Upload</a><a href="issues.html">Report Issue</a></nav>
+  </header>
 
-<script>
-let vantaEffect;
+  <main class="container">
+    <h1>Browse Notes</h1>
+    <p class="muted">Filter & find notes quickly. Use tabs to switch between Pinned, All, and Trending.</p>
 
-function initVanta() {
-  if (vantaEffect) vantaEffect.destroy();
-
-  const isMobile = window.innerWidth < 768;
-
-  vantaEffect = VANTA.NET({
-    el: "#bg-animation",
-    color: 0x5cf0ff,
-    backgroundColor: 0x020617,
-    scale: 1.0,
-    scaleMobile: 1.0,
-    points: isMobile ? 3 : 10,
-    maxDistance: isMobile ? 10 : 22,
-    spacing: isMobile ? 14 : 18,
-    showDots: true
-  });
-}
-
-document.addEventListener("DOMContentLoaded", initVanta);
-window.addEventListener("resize", () => {
-  clearTimeout(window.vantaTimeout);
-  window.vantaTimeout = setTimeout(initVanta, 250);
-});
-</script>
-
-<header>
-  <div class="logo">NoteHub</div>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="notes.html">Notes</a>
-    <a href="upload.html">Upload</a>
-    <a href="admin.html">Admin</a>
-  </nav>
-</header>
-
-<main class="container page-hero">
-  <h1>Browse Notes</h1>
-  <p>Find notes, PYQs, and uploaded materials easily.</p>
-
-  <input id="search" class="input" placeholder="Search by title, subject, tags...">
-  <div id="cards"></div>
-</main>
-
-<footer>© 2025 NoteHub</footer>
-
-<!-- Firebase Script -->
-<script type="module">
-import { initFirebase, db } from "./firebase.js";
-import { collection, query, where, orderBy, getDocs }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-initFirebase({
-  apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
-  authDomain: "studyhub-519c3.firebaseapp.com",
-  projectId: "studyhub-519c3",
-  storageBucket: "studyhub-519c3.firebasestorage.app",
-  messagingSenderId: "154821601505",
-  appId: "1:154821601505:web:84012068aba30ada806fa0"
-});
-
-const search = document.getElementById("search");
-const cards = document.getElementById("cards");
-
-async function load() {
-  cards.innerHTML = "<p class='muted'>Loading...</p>";
-
-  const q = query(
-    collection(db, "materials"),
-    where("approved", "==", true),
-    orderBy("createdAt", "desc")
-  );
-
-  const snap = await getDocs(q);
-  const items = [];
-  snap.forEach(d => items.push(d.data()));
-
-  render(items);
-}
-
-function render(list) {
-  const q = search.value.toLowerCase();
-  cards.innerHTML = "";
-
-  list.filter(it =>
-    it.title.toLowerCase().includes(q) ||
-    it.subject.toLowerCase().includes(q) ||
-    it.tags.toLowerCase().includes(q)
-  ).forEach(it => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <h3>${it.title}</h3>
-      <p class="muted">${it.subject} • ${it.type}</p>
-      <p>${it.description}</p>
-      <div class="card-actions">
-        <a class="btn small" href="${it.url}" target="_blank">View PDF</a>
+    <div class="card">
+      <div class="tabs">
+        <div id="tabPinned" class="tab active">Pinned</div>
+        <div id="tabAll" class="tab">All</div>
+        <div id="tabTrending" class="tab">Trending</div>
       </div>
-    `;
-    cards.appendChild(div);
-  });
-}
 
-search.addEventListener("input", load);
-load();
-</script>
+      <div class="top-controls">
+        <div class="filters">
+          <select id="f-subject" class="input"><option value="">Subject (A–E)</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option></select>
+          <select id="f-module" class="input"><option value="">Module</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+          <select id="f-type" class="input"><option value="">Type</option><option>Note</option><option>PYQ</option></select>
+          <select id="f-sort" class="input"><option value="new">Sort: Newest</option><option value="views">Sort: Most Viewed</option></select>
+        </div>
 
+        <div style="margin-left:auto">
+          <button id="clearFilters" class="btn small ghost">Clear</button>
+        </div>
+      </div>
+
+      <!-- Pinned row -->
+      <div id="pinnedRow" class="pinned-row" style="margin-bottom:20px;"></div>
+
+      <!-- Results grid -->
+      <div id="resultsGrid" class="grid"></div>
+
+      <!-- No results -->
+      <div id="noResults" style="display:none" class="muted">No notes found.</div>
+    </div>
+  </main>
+
+  <footer>© 2025 NoteHub</footer>
+
+  <script type="module">
+    import { initFirebase, db } from "./firebase.js";
+    import { collection, query, where, orderBy, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    initFirebase({
+      apiKey: "AIzaSyDKt2SwZ8huxz9kmXhqkvHTQWRwnE8MUO8",
+      authDomain: "studyhub-519c3.firebaseapp.com",
+      projectId: "studyhub-519c3",
+      storageBucket: "studyhub-519c3.firebasestorage.app",
+      messagingSenderId: "154821601505",
+      appId: "1:154821601505:web:84012068aba30ada806fa0"
+    });
+
+    const resultsGrid = document.getElementById('resultsGrid');
+    const pinnedRow = document.getElementById('pinnedRow');
+    const noResults = document.getElementById('noResults');
+
+    // local id + pins
+    let localId = localStorage.getItem("notehub_id");
+    if (!localId) { localId = "u_" + Math.random().toString(36).substring(2); localStorage.setItem("notehub_id", localId); }
+    let pinnedNotes = JSON.parse(localStorage.getItem("pins_" + localId)) || [];
+
+    let allNotes = [];
+
+    async function loadNotes() {
+      resultsGrid.innerHTML = "<p class='muted'>Loading...</p>";
+      const q = query(collection(db, "materials"), where("approved", "==", true), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      allNotes = [];
+      snap.forEach(d => { const it = d.data(); it.id = d.id; allNotes.push(it); });
+      renderActiveTab();
+    }
+
+    function filterAndSort(list) {
+      const s = document.getElementById('f-subject').value;
+      const m = document.getElementById('f-module').value;
+      const t = document.getElementById('f-type').value;
+      const sort = document.getElementById('f-sort').value;
+
+      let filtered = list.filter(it =>
+        (!s || it.subject === s) &&
+        (!m || it.module === m) &&
+        (!t || it.type === t)
+      );
+
+      if (sort === 'views') filtered.sort((a,b) => (b.views || 0) - (a.views || 0));
+      else filtered.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      return filtered;
+    }
+
+    function renderActiveTab() {
+      const active = document.querySelector('.tab.active').id;
+      if (active === 'tabPinned') renderPinned();
+      else if (active === 'tabAll') renderAll();
+      else if (active === 'tabTrending') renderTrending();
+    }
+
+    function renderPinned() {
+      pinnedRow.innerHTML = "";
+      const pinList = allNotes.filter(n => pinnedNotes.includes(n.id));
+      if (!pinList.length) pinnedRow.innerHTML = "<p class='muted'>No pinned notes yet. Pin some notes from All or Trending.</p>";
+      else pinList.forEach(it => {
+        const tile = makeNoteTile(it, true);
+        tile.classList.add('pinned-tile');
+        pinnedRow.appendChild(tile);
+      });
+      resultsGrid.innerHTML = "";
+      noResults.style.display = 'none';
+    }
+
+    function renderAll() {
+      pinnedRow.innerHTML = "";
+      const list = filterAndSort(allNotes);
+      resultsGrid.innerHTML = "";
+      if (!list.length) { noResults.style.display = 'block'; return; }
+      noResults.style.display = 'none';
+      list.forEach(it => resultsGrid.appendChild(makeNoteTile(it)));
+    }
+
+    function renderTrending() {
+      pinnedRow.innerHTML = "";
+      const list = allNotes.slice().sort((a,b) => (b.views||0) - (a.views||0)).slice(0, 12);
+      resultsGrid.innerHTML = "";
+      if (!list.length) { noResults.style.display = 'block'; return; }
+      noResults.style.display = 'none';
+      list.forEach(it => resultsGrid.appendChild(makeNoteTile(it)));
+    }
+
+    function makeNoteTile(it, pinnedTile = false) {
+      const card = document.createElement('div');
+      card.className = 'card note-card';
+      card.innerHTML = `
+        <div class="note-thumb">PDF</div>
+        <div style="flex:1">
+          <h3 style="margin:0">${it.title}</h3>
+          <div class="note-meta">${it.subject} • Module ${it.module} • ${it.type} • ${it.views || 0} views</div>
+          <p class="muted" style="margin-top:8px">${it.description || ''}</p>
+          <div class="card-actions">
+            <a class="btn small" target="_blank" href="${it.urlView || it.urlRaw || it.url || '#'}">View PDF</a>
+            <button class="btn small ghost pinBtn">${pinnedNotes.includes(it.id) ? 'Unpin' : 'Pin'}</button>
+            <a class="btn small ghost" href="issues.html?noteId=${it.id}">Report</a>
+          </div>
+        </div>
+      `;
+
+      const pinBtn = card.querySelector('.pinBtn');
+      pinBtn.onclick = () => {
+        if (pinnedNotes.includes(it.id)) pinnedNotes = pinnedNotes.filter(x => x !== it.id);
+        else pinnedNotes.push(it.id);
+        localStorage.setItem("pins_" + localId, JSON.stringify(pinnedNotes));
+        renderActiveTab();
+      };
+
+      // increment views when user clicks view (best-effort)
+      const viewLink = card.querySelector('a.btn.small');
+      viewLink.addEventListener('click', async () => {
+        try {
+          const ref = doc(db, 'materials', it.id);
+          await updateDoc(ref, { views: (it.views || 0) + 1 });
+        } catch (e) { console.warn('View increment failed', e); }
+      });
+
+      return card;
+    }
+
+    // Tab click handlers
+    document.getElementById('tabPinned').onclick = () => { setActiveTab('tabPinned'); renderActiveTab(); };
+    document.getElementById('tabAll').onclick = () => { setActiveTab('tabAll'); renderActiveTab(); };
+    document.getElementById('tabTrending').onclick = () => { setActiveTab('tabTrending'); renderActiveTab(); };
+
+    function setActiveTab(id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // Filters & controls
+    ['f-subject','f-module','f-type','f-sort'].forEach(id => {
+      document.getElementById(id).addEventListener('change', renderActiveTab);
+    });
+    document.getElementById('clearFilters').addEventListener('click', ()=> {
+      document.getElementById('f-subject').value = '';
+      document.getElementById('f-module').value = '';
+      document.getElementById('f-type').value = '';
+      document.getElementById('f-sort').value = 'new';
+      renderActiveTab();
+    });
+
+    await loadNotes();
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", ()=>{ if(window.vantaEffect) window.vantaEffect.destroy(); window.vantaEffect = VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617}); });</script>
 </body>
 </html>

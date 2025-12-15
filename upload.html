@@ -3,53 +3,74 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Upload Material — NoteHub</title>
+  <title>Upload</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<div id="bg-animation"></div>
-
 <header>
   <div class="logo">NoteHub</div>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/notes">Notes</a>
-    <a href="/issues">Report Issue</a>
-    <a href="/admin">Admin</a>
-  </nav>
+  <nav><a href="/notes">Notes</a></nav>
 </header>
 
-<main class="container page-hero">
+<main class="container">
   <h1>Upload Material</h1>
-  <p class="muted">Share notes or PYQs — admin will review.</p>
 
-  <form id="uploadForm" class="card">
+  <form class="card" id="form">
     <input id="title" class="input" placeholder="Title" required>
-    <select id="subject" class="input">
-      <option value="">Subject (A–E)</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+
+    <select id="subject">
+      <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
     </select>
-    <select id="module" class="input"><option value="">Module</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-    <select id="type" class="input"><option>Note</option><option>PYQ</option></select>
-    <input id="tags" class="input" placeholder="Tags">
-    <textarea id="desc" class="input" placeholder="Short description"></textarea>
-    <input id="file" type="file" accept="application/pdf" class="input" required>
-    <button class="btn" type="submit">Upload</button>
+
+    <select id="module">
+      <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+    </select>
+
+    <select id="type">
+      <option>Note</option>
+      <option>PYQ</option>
+    </select>
+
+    <textarea id="desc" class="input" placeholder="Description"></textarea>
+    <input id="file" type="file" accept="application/pdf" required>
+
+    <button class="btn">Upload</button>
     <p id="status" class="muted"></p>
   </form>
 </main>
 
 <footer>© 2025 NoteHub</footer>
 
-<script type="module" src="/script.js"></script>
+<script type="module">
+import { initFirebase, db } from "./firebase.js";
+import { uploadToCloudinary } from "./cloudinary.js";
+import { collection, addDoc, serverTimestamp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+initFirebase();
 
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-  VANTA.NET({ el:"#bg-animation", color:0x5cf0ff, backgroundColor:0x020617 });
-});
+document.getElementById("form").onsubmit = async e => {
+  e.preventDefault();
+  status.textContent = "Uploading...";
+
+  const pdf = await uploadToCloudinary(file.files[0]);
+
+  await addDoc(collection(db,"materials"),{
+    title:title.value,
+    subject:subject.value,
+    module:module.value,
+    type:type.value,
+    description:desc.value,
+    url:pdf.url,
+    fileName:pdf.fileName,
+    approved:false,
+    createdAt:serverTimestamp()
+  });
+
+  status.textContent = "Uploaded. Pending admin approval.";
+  e.target.reset();
+};
 </script>
 
 </body>

@@ -2,76 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Upload</title>
-  <link rel="stylesheet" href="/style.css">
+  <title>Upload | NoteHub</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <div class="logo">NoteHub</div>
-  <nav><a href="/notes">Notes</a></nav>
 </header>
 
 <main class="container">
   <h1>Upload Material</h1>
+  <p class="muted">Coming soon.</p>
 
-  <form class="card" id="form">
-    <input id="title" class="input" placeholder="Title" required>
-
-    <select id="subject">
-      <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-    </select>
-
-    <select id="module">
-      <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-    </select>
-
-    <select id="type">
-      <option>Note</option>
-      <option>PYQ</option>
-    </select>
-
-    <textarea id="desc" class="input" placeholder="Description"></textarea>
-    <input id="file" type="file" accept="application/pdf" required>
-
-    <button class="btn">Upload</button>
-    <p id="status" class="muted"></p>
-  </form>
+  <div class="card">
+    <p>This page will allow students to submit notes for review.</p>
+  </div>
 </main>
 
 <footer>© 2025 NoteHub</footer>
-
-<script type="module">
-import { initFirebase, db } from "./firebase.js";
-import { uploadToCloudinary } from "./cloudinary.js";
-import { collection, addDoc, serverTimestamp }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-initFirebase();
-
-document.getElementById("form").onsubmit = async e => {
-  e.preventDefault();
-  status.textContent = "Uploading...";
-
-  const pdf = await uploadToCloudinary(file.files[0]);
-
-  await addDoc(collection(db,"materials"),{
-    title:title.value,
-    subject:subject.value,
-    module:module.value,
-    type:type.value,
-    description:desc.value,
-    url:pdf.url,
-    fileName:pdf.fileName,
-    approved:false,
-    createdAt:serverTimestamp()
-  });
-
-  status.textContent = "Uploaded. Pending admin approval.";
-  e.target.reset();
-};
-</script>
 
 </body>
 </html>

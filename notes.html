@@ -2,81 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <title>Browse Notes | NoteHub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Browse Notes</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <div class="logo">NoteHub</div>
   <nav>
-    <a href="/">Home</a>
-    <a href="/upload">Upload</a>
+    <a href="index.html">Home</a>
   </nav>
 </header>
 
 <main class="container">
   <h1>Browse Notes</h1>
+  <p class="muted">Filter and download notes.</p>
 
   <div class="card">
-    <select id="subject">
-      <option value="">Subject</option>
-      <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
-    </select>
-
-    <select id="module">
-      <option value="">Module</option>
-      <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-    </select>
-
-    <select id="type">
-      <option value="">Type</option>
-      <option>Note</option>
-      <option>PYQ</option>
-    </select>
+    <div class="filters">
+      <select><option>Subject</option></select>
+      <select><option>Module</option></select>
+      <select><option>Type</option></select>
+    </div>
   </div>
 
-  <div id="cards"></div>
+  <div class="card">
+    <h3>Sample Note</h3>
+    <p class="muted">Subject A • Module 1 • Note</p>
+    <p>Dummy content for UI testing.</p>
+
+    <div class="card-actions">
+      <a class="btn ghost"
+         href="https://github.com/example/example/releases/download/v1/sample.pdf"
+         download
+         target="_blank">
+        Download PDF
+      </a>
+    </div>
+  </div>
 </main>
 
 <footer>© 2025 NoteHub</footer>
-
-<script type="module">
-import { initFirebase, db } from "./firebase.js";
-import { collection, query, where, getDocs } from
-"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-initFirebase();
-
-const cards = document.getElementById("cards");
-
-async function load() {
-  const q = query(collection(db,"materials"), where("approved","==",true));
-  const snap = await getDocs(q);
-  cards.innerHTML = "";
-
-  snap.forEach(d => {
-    const it = d.data();
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <h3>${it.title}</h3>
-      <p class="muted">${it.subject} • Module ${it.module} • ${it.type}</p>
-      <p>${it.description}</p>
-      <div class="card-actions">
-        <a class="btn" href="${it.url}" target="_blank">Open</a>
-        <a class="btn ghost" href="${it.url}" download="${it.fileName}">
-          Download
-        </a>
-      </div>
-    `;
-    cards.appendChild(div);
-  });
-}
-
-load();
-</script>
 
 </body>
 </html>

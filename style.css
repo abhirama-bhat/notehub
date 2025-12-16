@@ -1,9 +1,94 @@
-body{background:#020617;color:#e7eeff;font-family:Poppins}
-header{background:rgba(0,0,0,.4);backdrop-filter:blur(10px);padding:16px 32px;display:flex;justify-content:space-between}
-.card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(14px);border-radius:16px;padding:24px;margin-top:24px}
-.input,select,textarea{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.2);color:#fff;margin-top:12px}
-.btn{padding:12px 22px;border-radius:28px;background:linear-gradient(90deg,#5cf0ff,#a77bff);border:none;font-weight:600}
-.btn.ghost{background:transparent;border:2px solid #5cf0ff;color:#5cf0ff}
-.card-actions{display:flex;gap:12px;margin-top:16px}
-.container{max-width:1000px;margin:auto;padding:120px 20px}
-footer{text-align:center;margin:80px 0;color:#9bb3d4}
+body {
+  margin: 0;
+  background: #020617;
+  color: #e7eeff;
+  font-family: Poppins, system-ui, sans-serif;
+}
+
+header {
+  padding: 16px 32px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+nav a {
+  color: #e7eeff;
+  text-decoration: none;
+  margin-left: 16px;
+  opacity: 0.85;
+}
+
+nav a:hover {
+  opacity: 1;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 120px 20px;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+.muted {
+  color: #9bb3d4;
+}
+
+.actions {
+  margin-top: 24px;
+}
+
+.card {
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #e7eeff;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 28px;
+  background: linear-gradient(90deg,#5cf0ff,#a77bff);
+  color: #000;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 2px solid #5cf0ff;
+  color: #5cf0ff;
+}
+
+.card-actions {
+  margin-top: 16px;
+}
+
+footer {
+  text-align: center;
+  margin: 80px 0 40px;
+  color: #9bb3d4;
+}

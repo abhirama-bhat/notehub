@@ -1,30 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>NoteHub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <div class="logo">NoteHub</div>
-  <nav>
-    <a href="notes.html">Notes</a>
-  </nav>
-</header>
+<h1>📘 NoteHub</h1>
 
-<main class="container hero">
-  <h1>Smart Notes. Faster Learning.</h1>
-  <p class="muted">Curated notes & PYQs for first-year students.</p>
+<div class="filters">
+  <select id="cluster">
+    <option value="">Select Cluster</option>
+    <option value="CS">CS</option>
+    <option value="ME">ME</option>
+    <option value="EC">EC</option>
+    <option value="CV">CV</option>
+  </select>
 
-  <div class="actions">
-    <a class="btn" href="notes.html">Browse Notes</a>
-  </div>
-</main>
+  <select id="subject">
+    <option value="">Select Subject</option>
+  </select>
 
-<footer>© 2025 NoteHub by Notecrew </footer>
+  <select id="module">
+    <option value="">Select Module</option>
+  </select>
+</div>
 
+<input id="search" type="text" placeholder="Search notes...">
+
+<div id="notes"></div>
+
+<hr>
+
+<div class="actions">
+  <a href="admin.html">➕ Submit Notes</a>
+  <a href="mailto:notehub.admin@gmail.com?subject=Notes%20Request">📩 Request Notes</a>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

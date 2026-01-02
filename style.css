@@ -21,8 +21,16 @@ h1, h2 {
   border-radius: 6px;
 }
 
-.actions a {
-  margin-right: 15px;
+.actions a, .gmail-btn {
+  display: inline-block;
+  margin: 8px;
+  padding: 10px 14px;
+  background: #1976d2;
+  color: white;
   text-decoration: none;
-  font-weight: bold;
+  border-radius: 5px;
+}
+
+.actions a:hover, .gmail-btn:hover {
+  background: #0d47a1;
 }

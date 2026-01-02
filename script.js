@@ -10,7 +10,6 @@ fetch("notes.json")
   .then(r => r.json())
   .then(d => {
     notes = d;
-    updateSubjects();
     renderNotes();
   });
 
@@ -32,20 +31,18 @@ search.oninput = renderNotes;
 
 function updateSubjects() {
   if (!cluster.value) return;
-  const subjects = [...new Set(
+  [...new Set(
     notes.filter(n => n.cluster === cluster.value).map(n => n.subject)
-  )];
-  subjects.forEach(s => subject.innerHTML += `<option>${s}</option>`);
+  )].forEach(s => subject.innerHTML += `<option>${s}</option>`);
 }
 
 function updateModules() {
   if (!cluster.value || !subject.value) return;
-  const modules = [...new Set(
+  [...new Set(
     notes.filter(n =>
       n.cluster === cluster.value && n.subject === subject.value
     ).map(n => n.module)
-  )];
-  modules.forEach(m => moduleSel.innerHTML += `<option>${m}</option>`);
+  )].forEach(m => moduleSel.innerHTML += `<option>${m}</option>`);
 }
 
 function renderNotes() {

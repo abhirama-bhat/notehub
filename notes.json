@@ -1,9 +1,12 @@
 [
   {
-    "cluster": "EC",
-    "subject": "Electronics",
-    "module": "Module 4",
-    "title": "Module 4 Electronics Notes",
+    "title": "Introduction to Electronics – Module 4",
+    "tags": [
+      "CS",
+      "Introduction to Electronics",
+      "Electronics",
+      "Module 4"
+    ],
     "file": "Module 4 electronics.pdf"
   }
 ]

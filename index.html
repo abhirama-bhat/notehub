@@ -9,25 +9,31 @@
 
 <div class="app">
 
-  <!-- LEFT SIDEBAR -->
   <aside class="sidebar">
-    <h3>Cluster</h3>
-    <button class="filter" data-tag="CS">CS Cluster</button>
-    <button class="filter" data-tag="EE">EE Cluster</button>
-    <button class="filter" data-tag="ME">ME Cluster</button>
+    <div class="logo">📘 NoteHub</div>
 
-    <h3>Cycle</h3>
-    <button class="filter" data-tag="P-Cycle">P-Cycle</button>
-    <button class="filter" data-tag="C-Cycle">C-Cycle</button>
+    <div class="filter-group" data-group="cluster">
+      <h4>Cluster</h4>
+      <button data-tag="CS">CS</button>
+      <button data-tag="EE">EE</button>
+      <button data-tag="ME">ME</button>
+    </div>
 
-    <h3>Semester</h3>
-    <button class="filter" data-tag="Sem 1">Sem 1</button>
-    <button class="filter" data-tag="Sem 2">Sem 2</button>
+    <div class="filter-group" data-group="cycle">
+      <h4>Cycle</h4>
+      <button data-tag="P-Cycle">P-Cycle</button>
+      <button data-tag="C-Cycle">C-Cycle</button>
+    </div>
+
+    <div class="filter-group" data-group="semester">
+      <h4>Semester</h4>
+      <button data-tag="Sem 1">Sem 1</button>
+      <button data-tag="Sem 2">Sem 2</button>
+    </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
-  <main>
-    <input type="text" id="search" placeholder="Search subject...">
+  <main class="content">
+    <input id="search" placeholder="Search subjects..." />
     <div id="notes"></div>
   </main>
 

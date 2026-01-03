@@ -1,47 +1,53 @@
 let notes = [];
-let activeTags = new Set();
+const activeTags = {};
 
 const notesDiv = document.getElementById("notes");
 const search = document.getElementById("search");
-const buttons = document.querySelectorAll(".filter");
 
 // Load notes
 fetch("notes.json")
-  .then(res => res.json())
+  .then(r => r.json())
   .then(data => {
     notes = data;
     renderNotes();
   });
 
-// Toggle tag buttons
-buttons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const tag = btn.dataset.tag;
+// Handle filter groups
+document.querySelectorAll(".filter-group").forEach(group => {
+  const groupName = group.dataset.group;
 
-    if (activeTags.has(tag)) {
-      activeTags.delete(tag);
-      btn.classList.remove("active");
-    } else {
-      activeTags.add(tag);
-      btn.classList.add("active");
-    }
+  group.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Unselect others in same group
+      group.querySelectorAll("button").forEach(b => b.classList.remove("active"));
 
-    renderNotes();
+      // Toggle current
+      if (activeTags[groupName] === btn.dataset.tag) {
+        delete activeTags[groupName];
+      } else {
+        btn.classList.add("active");
+        activeTags[groupName] = btn.dataset.tag;
+      }
+
+      renderNotes();
+    });
   });
 });
 
-// Render notes
+search.addEventListener("input", renderNotes);
+
+// Render
 function renderNotes() {
   notesDiv.innerHTML = "";
   const keyword = search.value.toLowerCase();
 
   const filtered = notes.filter(note =>
-    [...activeTags].every(tag => note.tags.includes(tag)) &&
+    Object.values(activeTags).every(tag => note.tags.includes(tag)) &&
     note.title.toLowerCase().includes(keyword)
   );
 
-  if (filtered.length === 0) {
-    notesDiv.innerHTML = "<p>Select filters to see notes.</p>";
+  if (!filtered.length) {
+    notesDiv.innerHTML = "<p>Select filters to view notes.</p>";
     return;
   }
 
@@ -55,5 +61,3 @@ function renderNotes() {
     `;
   });
 }
-
-search.addEventListener("input", renderNotes);

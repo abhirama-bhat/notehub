@@ -5,40 +5,53 @@
   <title>NoteHub</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home">
 
-<div class="app">
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">📘 NoteHub</div>
+  <a href="notes.html" class="nav-link">Browse</a>
+</nav>
 
-  <aside class="sidebar">
-    <div class="logo">📘 NoteHub</div>
+<!-- HERO -->
+<section class="hero">
+  <h1 class="hero-title">All Engineering Notes.<br>One Intelligent Hub.</h1>
+  <p class="hero-sub">Search, pin, and download curated PDFs instantly.</p>
 
-    <div class="filter-group" data-group="cluster">
-      <h4>Cluster</h4>
-      <button data-tag="CS">CS</button>
-      <button data-tag="EE">EE</button>
-      <button data-tag="ME">ME</button>
-    </div>
+  <div class="search-bar">
+    <input placeholder="Search notes…" disabled>
+    <span>↵</span>
+  </div>
+</section>
 
-    <div class="filter-group" data-group="cycle">
-      <h4>Cycle</h4>
-      <button data-tag="P-Cycle">P-Cycle</button>
-      <button data-tag="C-Cycle">C-Cycle</button>
-    </div>
+<!-- FLOATING ACTION TILES -->
+<section class="tiles">
 
-    <div class="filter-group" data-group="semester">
-      <h4>Semester</h4>
-      <button data-tag="Sem 1">Sem 1</button>
-      <button data-tag="Sem 2">Sem 2</button>
-    </div>
-  </aside>
+  <div class="tile glow" onclick="location.href='notes.html'">
+    <h3>📚 Browse Notes</h3>
+    <p>Explore by cluster, semester & tags</p>
+  </div>
 
-  <main class="content">
-    <input id="search" placeholder="Search subjects..." />
-    <div id="notes"></div>
-  </main>
+  <div class="tile" onclick="location.href='submit.html'">
+    <h3>⬆ Upload Notes</h3>
+    <p>Send PDFs for admin review</p>
+  </div>
 
-</div>
+  <div class="tile" onclick="location.href='notes.html#popular'">
+    <h3>🔥 Popular</h3>
+    <p>Most downloaded notes</p>
+  </div>
 
-<script src="script.js"></script>
+</section>
+
+<!-- PINNED -->
+<section class="pinned">
+  <h2>📌 Pinned Notes</h2>
+  <div class="pin-card">
+    <h4>Introduction to Electronics – Module 4</h4>
+    <a href="Module 4 electronics.pdf" download>Download</a>
+  </div>
+</section>
+
 </body>
 </html>

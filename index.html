@@ -9,40 +9,13 @@
 
 <h1>📘 NoteHub</h1>
 
-<div class="filters">
-  <select id="cluster">
-    <option value="">Select Cluster</option>
-    <option value="CS">CS</option>
-    <option value="ME">ME</option>
-    <option value="EC">EC</option>
-    <option value="CV">CV</option>
-  </select>
+<select id="tagFilter">
+  <option value="">Filter by tag</option>
+</select>
 
-  <select id="subject">
-    <option value="">Select Subject</option>
-  </select>
-
-  <select id="module">
-    <option value="">Select Module</option>
-  </select>
-</div>
-
-<input id="search" type="text" placeholder="Search notes...">
+<input type="text" id="search" placeholder="Search notes...">
 
 <div id="notes"></div>
-
-<hr>
-
-<div class="actions">
-  <a href="admin.html">➕ Submit Notes</a>
-
-  <a href="https://mail.google.com/mail/?view=cm&fs=1
-  &to=flamewings1289@gmail.com
-  &su=Notes%20Request
-  &body=Cluster:%0ASubject:%0AModule:%0ARequested%20Topic:%0A">
-  📩 Request Notes
-  </a>
-</div>
 
 <script src="script.js"></script>
 </body>

@@ -1,70 +1,34 @@
 let notes = [];
 
-// UI elements
-const cluster = document.getElementById("cluster");
-const subject = document.getElementById("subject");
-const moduleSel = document.getElementById("module");
+const tagFilter = document.getElementById("tagFilter");
 const notesDiv = document.getElementById("notes");
 const search = document.getElementById("search");
 
-// Load notes data
+// Load notes
 fetch("notes.json")
   .then(res => res.json())
   .then(data => {
     notes = data;
+    populateTags();
     renderNotes();
   })
   .catch(() => {
     notesDiv.innerHTML = "<p>Error loading notes.</p>";
   });
 
-// Event listeners
-cluster.addEventListener("change", () => {
-  subject.innerHTML = `<option value="">Select Subject</option>`;
-  moduleSel.innerHTML = `<option value="">Select Module</option>`;
-  updateSubjects();
-  renderNotes();
-});
+// Build tag filter from JSON
+function populateTags() {
+  const tags = new Set();
 
-subject.addEventListener("change", () => {
-  moduleSel.innerHTML = `<option value="">Select Module</option>`;
-  updateModules();
-  renderNotes();
-});
-
-moduleSel.addEventListener("change", renderNotes);
-search.addEventListener("input", renderNotes);
-
-// Populate subject dropdown
-function updateSubjects() {
-  if (!cluster.value) return;
-
-  const subjects = [...new Set(
-    notes
-      .filter(n => n.cluster === cluster.value)
-      .map(n => n.subject)
-  )];
-
-  subjects.forEach(s => {
-    subject.innerHTML += `<option value="${s}">${s}</option>`;
+  notes.forEach(note => {
+    note.tags.forEach(tag => tags.add(tag));
   });
-}
 
-// Populate module dropdown
-function updateModules() {
-  if (!cluster.value || !subject.value) return;
-
-  const modules = [...new Set(
-    notes
-      .filter(n =>
-        n.cluster === cluster.value &&
-        n.subject === subject.value
-      )
-      .map(n => n.module)
-  )];
-
-  modules.forEach(m => {
-    moduleSel.innerHTML += `<option value="${m}">${m}</option>`;
+  tags.forEach(tag => {
+    const opt = document.createElement("option");
+    opt.value = tag;
+    opt.textContent = tag;
+    tagFilter.appendChild(opt);
   });
 }
 
@@ -72,27 +36,30 @@ function updateModules() {
 function renderNotes() {
   notesDiv.innerHTML = "";
 
+  const selectedTag = tagFilter.value;
   const keyword = search.value.toLowerCase();
 
-  const filtered = notes.filter(n =>
-    (!cluster.value || n.cluster === cluster.value) &&
-    (!subject.value || n.subject === subject.value) &&
-    (!moduleSel.value || n.module === moduleSel.value) &&
-    n.title.toLowerCase().includes(keyword)
+  const filtered = notes.filter(note =>
+    (!selectedTag || note.tags.includes(selectedTag)) &&
+    note.title.toLowerCase().includes(keyword)
   );
 
   if (filtered.length === 0) {
-    notesDiv.innerHTML = "<p>No notes available.</p>";
+    notesDiv.innerHTML = "<p>No notes found.</p>";
     return;
   }
 
-  filtered.forEach(n => {
+  filtered.forEach(note => {
     notesDiv.innerHTML += `
       <div class="note">
-        <h3>${n.title}</h3>
-        <p>${n.subject} — ${n.module}</p>
-        <a href="${n.file}" download>⬇ Download PDF</a>
+        <h3>${note.title}</h3>
+        <p>Tags: ${note.tags.join(", ")}</p>
+        <a href="${note.file}" download>⬇ Download PDF</a>
       </div>
     `;
   });
 }
+
+// Events
+tagFilter.addEventListener("change", renderNotes);
+search.addEventListener("input", renderNotes);

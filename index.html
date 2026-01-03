@@ -7,15 +7,31 @@
 </head>
 <body>
 
-<h1>📘 NoteHub</h1>
+<div class="app">
 
-<select id="tagFilter">
-  <option value="">Filter by tag</option>
-</select>
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <h3>Cluster</h3>
+    <button class="filter" data-tag="CS">CS Cluster</button>
+    <button class="filter" data-tag="EE">EE Cluster</button>
+    <button class="filter" data-tag="ME">ME Cluster</button>
 
-<input type="text" id="search" placeholder="Search notes...">
+    <h3>Cycle</h3>
+    <button class="filter" data-tag="P-Cycle">P-Cycle</button>
+    <button class="filter" data-tag="C-Cycle">C-Cycle</button>
 
-<div id="notes"></div>
+    <h3>Semester</h3>
+    <button class="filter" data-tag="Sem 1">Sem 1</button>
+    <button class="filter" data-tag="Sem 2">Sem 2</button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <input type="text" id="search" placeholder="Search subject...">
+    <div id="notes"></div>
+  </main>
+
+</div>
 
 <script src="script.js"></script>
 </body>

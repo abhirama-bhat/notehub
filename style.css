@@ -1,36 +1,57 @@
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  background: #0b1220;
+  color: white;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
   padding: 20px;
+  background: #0f172a;
 }
 
-h1, h2 {
-  text-align: center;
+.sidebar h3 {
+  margin-top: 20px;
+  font-size: 14px;
+  opacity: 0.7;
 }
 
-.filters select, #search {
+.sidebar button {
+  display: block;
+  width: 100%;
+  margin: 6px 0;
   padding: 8px;
-  margin: 5px;
-}
-
-.note {
-  background: #fff;
-  padding: 12px;
-  margin: 10px auto;
-  max-width: 600px;
+  background: #1e293b;
+  border: none;
+  color: white;
+  cursor: pointer;
   border-radius: 6px;
 }
 
-.actions a, .gmail-btn {
-  display: inline-block;
-  margin: 8px;
-  padding: 10px 14px;
-  background: #1976d2;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
+.sidebar button.active {
+  background: #2563eb;
 }
 
-.actions a:hover, .gmail-btn:hover {
-  background: #0d47a1;
+main {
+  flex: 1;
+  padding: 30px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.note {
+  background: #111827;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 12px;
 }

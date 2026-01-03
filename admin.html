@@ -2,33 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Submit Notes</title>
+  <title>Admin Panel</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Submit Notes to Admin</h2>
+<h2>Admin Upload Workflow</h2>
 
-<a class="gmail-btn" href="https://mail.google.com/mail/?view=cm&fs=1
-&to=flamewings1289@gmail.com
-&su=Note%20Submission
-&body=Cluster:%0ASubject:%0AModule:%0ATitle:%0AContent:%0A">
-📤 Send Notes via Gmail
-</a>
+<ol>
+  <li>Receive notes via email</li>
+  <li>Review content</li>
+  <li>Upload PDF to NOTEHUB folder</li>
+  <li>Add entry in <code>notes.json</code></li>
+  <li>Commit & push</li>
+</ol>
 
-<hr>
-
-<h2>Request Notes</h2>
-
-<a class="gmail-btn" href="https://mail.google.com/mail/?view=cm&fs=1
-&to=flamewings1289@gmail.com
-&su=Notes%20Request
-&body=Cluster:%0ASubject:%0AModule:%0ARequested%20Topic:%0A">
-📩 Request via Gmail
-</a>
-
-<br><br>
-<a href="index.html">⬅ Back to App</a>
+<pre>
+git add .
+git commit -m "Add approved notes"
+git push
+</pre>
 
 </body>
 </html>

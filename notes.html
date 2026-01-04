@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Notes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="bg"></div>
+
+<nav class="nav">
+  <a href="index.html" class="nav-link">Home</a>
+</nav>
+
+<button class="filter-toggle" onclick="toggleFilters()">Filters</button>
+
+<div class="notes-layout">
+
+  <aside class="filters" id="filters">
+    <h3>Cluster</h3>
+    <button data-group="cluster" data-tag="CS">CS</button>
+    <button data-group="cluster" data-tag="EC">EC</button>
+    <button data-group="cluster" data-tag="ME">ME</button>
+    <button data-group="cluster" data-tag="CV">CV</button>
+
+    <h3>Cycle</h3>
+    <button data-group="cycle" data-tag="P-Cycle">P-Cycle</button>
+    <button data-group="cycle" data-tag="C-Cycle">C-Cycle</button>
+
+    <h3>Semester</h3>
+    <button data-group="semester" data-tag="Sem 1">Sem 1</button>
+    <button data-group="semester" data-tag="Sem 2">Sem 2</button>
+  </aside>
+
+  <main class="grid" id="notesGrid"></main>
+
+</div>
+
+<script src="bg.js"></script>
+<script src="notes.js"></script>
+</body>
+</html>

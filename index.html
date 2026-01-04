@@ -2,56 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NoteHub</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="home">
+<body>
 
-<!-- NAV -->
+<div id="bg"></div>
+
 <nav class="nav">
   <div class="logo">📘 NoteHub</div>
   <a href="notes.html" class="nav-link">Browse</a>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-  <h1 class="hero-title">All Engineering Notes.<br>One Intelligent Hub.</h1>
-  <p class="hero-sub">Search, pin, and download curated PDFs instantly.</p>
+  <h1>All Engineering Notes.<br>One Intelligent Hub.</h1>
+  <p>Browse calmly. Download confidently.</p>
 
-  <div class="search-bar">
-    <input placeholder="Search notes…" disabled>
-    <span>↵</span>
+  <div class="cta" onclick="location.href='notes.html'">
+    Browse notes by cluster & semester →
   </div>
 </section>
 
-<!-- FLOATING ACTION TILES -->
 <section class="tiles">
-
-  <div class="tile glow" onclick="location.href='notes.html'">
-    <h3>📚 Browse Notes</h3>
-    <p>Explore by cluster, semester & tags</p>
+  <div class="tile" onclick="location.href='notes.html'">
+    <h3>Browse Notes</h3>
+    <p>Explore available notes</p>
   </div>
 
   <div class="tile" onclick="location.href='submit.html'">
-    <h3>⬆ Upload Notes</h3>
-    <p>Send PDFs for admin review</p>
+    <h3>Upload Notes</h3>
+    <p>Submit PDFs for review</p>
   </div>
 
-  <div class="tile" onclick="location.href='notes.html#popular'">
-    <h3>🔥 Popular</h3>
-    <p>Most downloaded notes</p>
-  </div>
-
-</section>
-
-<!-- PINNED -->
-<section class="pinned">
-  <h2>📌 Pinned Notes</h2>
-  <div class="pin-card">
-    <h4>Introduction to Electronics – Module 4</h4>
-    <a href="Module 4 electronics.pdf" download>Download</a>
+  <div class="tile" id="popularBtn">
+    <h3>Popular</h3>
+    <p>Curated high-value notes</p>
   </div>
 </section>
 
+<script src="bg.js"></script>
+<script src="home.js"></script>
 </body>
 </html>
